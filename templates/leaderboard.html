@@ -31,16 +31,43 @@
 
       <section id="totals-section" class="mt-2 grid gap-4 sm:grid-cols-3" aria-label="Fundraising totals">
         <div class="rounded-2xl border border-amber-100 bg-gradient-to-br from-amber-50 to-white p-6 shadow-sm">
-          <p class="text-xs font-bold uppercase tracking-wide text-amber-800">Maryland total</p>
-          <p class="mt-2 text-3xl font-bold text-slate-900" id="total-md">—</p>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wide text-amber-800">Maryland total</p>
+              <p class="mt-2 text-2xl font-bold tabular-nums text-slate-900 sm:text-3xl" id="total-md">—</p>
+            </div>
+            <div class="border-l border-amber-200/80 pl-4">
+              <p class="text-xs font-bold uppercase leading-tight tracking-wide text-amber-800">Maryland Total per Mile</p>
+              <p class="mt-2 text-2xl font-bold tabular-nums text-amber-950 sm:text-3xl" id="total-md-pm">—</p>
+              <p class="mt-1 text-[10px] text-amber-800/80">÷ 350 mi</p>
+            </div>
+          </div>
         </div>
         <div class="rounded-2xl border border-sky-100 bg-gradient-to-br from-sky-50 to-white p-6 shadow-sm">
-          <p class="text-xs font-bold uppercase tracking-wide text-sky-800">Pittsburgh total</p>
-          <p class="mt-2 text-3xl font-bold text-slate-900" id="total-pgh">—</p>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wide text-sky-800">Pittsburgh total</p>
+              <p class="mt-2 text-2xl font-bold tabular-nums text-slate-900 sm:text-3xl" id="total-pgh">—</p>
+            </div>
+            <div class="border-l border-sky-200/80 pl-4">
+              <p class="text-xs font-bold uppercase leading-tight tracking-wide text-sky-800">Pittsburgh Total per Mile</p>
+              <p class="mt-2 text-2xl font-bold tabular-nums text-sky-950 sm:text-3xl" id="total-pgh-pm">—</p>
+              <p class="mt-1 text-[10px] text-sky-800/80">÷ 350 mi</p>
+            </div>
+          </div>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:col-span-1">
-          <p class="text-xs font-bold uppercase tracking-wide text-slate-600">Combined</p>
-          <p class="mt-2 text-3xl font-bold text-slate-900" id="total-combined">—</p>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wide text-slate-600">Combined</p>
+              <p class="mt-2 text-2xl font-bold tabular-nums text-slate-900 sm:text-3xl" id="total-combined">—</p>
+            </div>
+            <div class="border-l border-slate-200 pl-4">
+              <p class="text-xs font-bold uppercase leading-tight tracking-wide text-slate-600">Combined Total per Mile</p>
+              <p class="mt-2 text-2xl font-bold tabular-nums text-slate-800 sm:text-3xl" id="total-combined-pm">—</p>
+              <p class="mt-1 text-[10px] text-slate-500">÷ 350 mi</p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -73,10 +100,24 @@
 
     <script>
       (function () {
+        var MILES = 350;
+
         function fmtMoney(n) {
           var x = Number(n);
           if (!isFinite(x)) return "—";
           return new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(x);
+        }
+
+        function fmtPerMile(total) {
+          var x = Number(total) / MILES;
+          if (!isFinite(x)) return "—";
+          var rounded = Math.round(x * 100) / 100;
+          return new Intl.NumberFormat(undefined, {
+            style: "currency",
+            currency: "USD",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(rounded);
         }
 
         function esc(s) {
@@ -102,7 +143,7 @@
             li.className = "px-4 py-3";
             var msg = d.message ? '<p class="mt-1 text-xs text-slate-500">' + esc(d.message) + "</p>" : "";
             li.innerHTML =
-              '<div class="flex items-start justify-between gap-2">' +
+              '<div class="flex items-start justify-between gap-3">' +
               '<div class="min-w-0">' +
               '<span class="text-xs font-semibold text-slate-400">#' +
               (i + 1) +
@@ -112,9 +153,23 @@
               "</p>" +
               msg +
               "</div>" +
-              '<span class="shrink-0 text-sm font-bold text-amber-800">' +
+              '<div class="flex shrink-0 gap-3 text-right">' +
+              '<div>' +
+              '<p class="text-[10px] font-semibold uppercase tracking-wide text-slate-400">Total</p>' +
+              '<p class="text-sm font-bold tabular-nums text-amber-800">' +
               fmtMoney(d.amount) +
-              "</span>" +
+              "</p>" +
+              "</div>" +
+              '<div class="border-l border-slate-200 pl-3">' +
+              '<p class="text-[10px] font-semibold uppercase leading-tight tracking-wide text-slate-400">Per mile</p>' +
+              '<p class="text-sm font-bold tabular-nums text-slate-700">' +
+              fmtPerMile(d.amount) +
+              "</p>" +
+              '<p class="text-[9px] text-slate-400">÷' +
+              MILES +
+              "</p>" +
+              "</div>" +
+              "</div>" +
               "</div>";
             ul.appendChild(li);
           });
@@ -130,8 +185,11 @@
           .then(function (data) {
             var t = data.totals || {};
             document.getElementById("total-md").textContent = fmtMoney(t.maryland);
+            document.getElementById("total-md-pm").textContent = fmtPerMile(t.maryland);
             document.getElementById("total-pgh").textContent = fmtMoney(t.pittsburgh);
+            document.getElementById("total-pgh-pm").textContent = fmtPerMile(t.pittsburgh);
             document.getElementById("total-combined").textContent = fmtMoney(t.combined);
+            document.getElementById("total-combined-pm").textContent = fmtPerMile(t.combined);
 
             var td = data.top_donors || {};
             renderList(document.getElementById("list-maryland"), td.maryland, "No Maryland donations yet.");

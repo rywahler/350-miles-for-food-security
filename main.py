@@ -328,10 +328,17 @@ def _call_claude_for_receipt(pdf_b64: str) -> str:
     return "".join(parts).strip()
 
 
+def _form_bool_truthy(value: str | None) -> bool:
+    if value is None:
+        return False
+    return value.strip().lower() in ("true", "1", "yes", "on")
+
+
 @app.post("/api/upload-receipt")
 async def upload_receipt(
     file: UploadFile = File(..., description="Donation receipt PDF"),
     message: str = Form(""),
+    anonymous: str = Form(""),
 ):
     if supabase is None:
         raise HTTPException(
@@ -368,9 +375,11 @@ async def upload_receipt(
     donor_name = data.get("donor_name")
     amount_raw = data.get("amount")
     charity_choice = data.get("charity_choice")
+    anonymous_opt_in = _form_bool_truthy(anonymous)
 
-    if not isinstance(donor_name, str) or not donor_name.strip():
-        raise HTTPException(status_code=422, detail="Missing or invalid donor_name in model output.")
+    if not anonymous_opt_in:
+        if not isinstance(donor_name, str) or not donor_name.strip():
+            raise HTTPException(status_code=422, detail="Missing or invalid donor_name in model output.")
     try:
         amount = float(amount_raw)
     except (TypeError, ValueError):
@@ -383,8 +392,10 @@ async def upload_receipt(
         )
 
     msg_clean = message.strip() if isinstance(message, str) else ""
+    final_name = "Anonymous" if anonymous_opt_in else str(donor_name).strip()
+
     row = {
-        "donor_name": donor_name.strip(),
+        "donor_name": final_name,
         "amount": amount,
         "charity_choice": charity_choice,
         "message": msg_clean or None,
