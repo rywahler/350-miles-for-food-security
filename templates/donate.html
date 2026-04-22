@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="min-h-screen bg-slate-50 font-sans text-slate-800 antialiased">
+    <header class="border-b border-slate-200 bg-white">
+      <div class="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-4 py-5">
+        <a href="/" class="text-sm font-semibold text-amber-700 hover:text-amber-900">← Home</a>
+        <a
+          href="/leaderboards"
+          class="text-sm font-semibold text-slate-600 hover:text-slate-900"
+          >Leaderboards</a
+        >
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-3xl px-4 py-10">
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{{ title }}</h1>
+      <p class="mt-2 text-slate-600">
+        Rather than dealing with a pool of donations we are having participants donate directly to the food banks. 
+        Donate on the food bank’s official site first, then upload your PDF receipt here to appear on the leaderboard. 
+        All you need to do to retrieve your pdf receipt is 
+        export the confirmation email from the respective food bank as a PDF. Every donation is very appreciated but 
+        due to space constraints we will only be displaying the top 100 donors on the leaderboard. Thank you for your support!
+      </p>
+
+      <section class="mt-10 grid gap-4 sm:grid-cols-2">
+        <a
+          href="https://www.mdfoodbank.org/donate/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex min-h-[140px] flex-col justify-center rounded-2xl border-2 border-amber-200 bg-gradient-to-br from-amber-50 to-white p-6 text-center shadow-sm transition hover:border-amber-400 hover:shadow-md"
+        >
+          <span class="text-xs font-bold uppercase tracking-wide text-amber-800">Official donation</span>
+          <span class="mt-2 text-lg font-bold text-slate-900">Maryland Food Bank</span>
+          <span class="mt-2 text-sm font-medium text-amber-700">Open donation page →</span>
+        </a>
+        <a
+          href="https://www.pittsburghfoodbank.org/donate/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex min-h-[140px] flex-col justify-center rounded-2xl border-2 border-sky-200 bg-gradient-to-br from-sky-50 to-white p-6 text-center shadow-sm transition hover:border-sky-400 hover:shadow-md"
+        >
+          <span class="text-xs font-bold uppercase tracking-wide text-sky-800">Official donation</span>
+          <span class="mt-2 text-lg font-bold text-slate-900">Greater Pittsburgh Community Food Bank</span>
+          <span class="mt-2 text-sm font-medium text-sky-700">Open donation page →</span>
+        </a>
+      </section>
+
+      <section class="mt-12 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <h2 class="text-lg font-semibold text-slate-900">Upload your receipt</h2>
+        <p class="mt-2 text-sm text-slate-600">
+          PDF only. We use AI to read the receipt and add you to the correct regional leaderboard. Optional message is
+          shown next to your name.
+        </p>
+
+        <form id="receipt-form" class="mt-6 space-y-5" enctype="multipart/form-data" action="#" method="post">
+          <div>
+            <label for="receipt-pdf" class="block text-sm font-medium text-slate-700">Receipt (PDF)</label>
+            <input
+              id="receipt-pdf"
+              name="file"
+              type="file"
+              accept="application/pdf,.pdf"
+              required
+              class="mt-2 block w-full cursor-pointer rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-amber-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-amber-700"
+            />
+          </div>
+          <div>
+            <label for="donor-message" class="block text-sm font-medium text-slate-700">Optional message</label>
+            <input
+              id="donor-message"
+              name="message"
+              type="text"
+              maxlength="500"
+              placeholder="Shown on the leaderboard (optional)"
+              class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+            />
+          </div>
+
+          <div class="flex flex-wrap items-center gap-4">
+            <button
+              type="submit"
+              id="submit-btn"
+              class="inline-flex items-center justify-center rounded-full bg-amber-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-amber-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <span id="btn-label">Submit receipt</span>
+              <span id="btn-spinner" class="ml-2 hidden h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" aria-hidden="true"></span>
+            </button>
+            <p id="form-error" class="hidden text-sm font-medium text-red-600" role="alert"></p>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <script>
+      (function () {
+        var form = document.getElementById("receipt-form");
+        var btn = document.getElementById("submit-btn");
+        var btnLabel = document.getElementById("btn-label");
+        var spinner = document.getElementById("btn-spinner");
+        var errEl = document.getElementById("form-error");
+
+        function setLoading(on) {
+          btn.disabled = on;
+          spinner.classList.toggle("hidden", !on);
+          btnLabel.textContent = on ? "Processing…" : "Submit receipt";
+        }
+
+        function showError(msg) {
+          errEl.textContent = msg || "Something went wrong.";
+          errEl.classList.remove("hidden");
+        }
+
+        function hideError() {
+          errEl.classList.add("hidden");
+          errEl.textContent = "";
+        }
+
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          hideError();
+
+          var pdfInput = document.getElementById("receipt-pdf");
+          var msgInput = document.getElementById("donor-message");
+          var f = pdfInput.files && pdfInput.files[0];
+          if (!f) {
+            showError("Please choose a PDF file.");
+            return;
+          }
+
+          var fd = new FormData();
+          fd.append("file", f, f.name);
+          fd.append("message", (msgInput && msgInput.value) || "");
+
+          var navigated = false;
+          setLoading(true);
+
+          fetch("/api/upload-receipt", {
+            method: "POST",
+            body: fd,
+          })
+            .then(function (res) {
+              return res.text().then(function (text) {
+                var body = {};
+                try {
+                  body = text ? JSON.parse(text) : {};
+                } catch (ignore) {
+                  body = { detail: text ? text.slice(0, 240) : "Invalid response" };
+                }
+                return { ok: res.ok, status: res.status, body: body };
+              });
+            })
+            .then(function (r) {
+              if (r.ok && r.body && r.body.success) {
+                navigated = true;
+                window.location.href = "/leaderboards";
+                return;
+              }
+              var detail = r.body && (r.body.detail || r.body.message);
+              if (typeof detail === "string") showError(detail);
+              else if (Array.isArray(detail)) showError(detail.map(function (d) { return d.msg || d; }).join(" "));
+              else showError("Upload failed (" + r.status + ").");
+            })
+            .catch(function () {
+              showError("Network error. Try again.");
+            })
+            .finally(function () {
+              if (!navigated) setLoading(false);
+            });
+        });
+      })();
+    </script>
+  </body>
+</html>

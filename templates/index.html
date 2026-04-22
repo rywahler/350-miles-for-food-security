@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="350-mile ride from Pittsburgh to Washington, D.C. fundraising for Maryland and Pittsburgh food security."
+    />
+    <title>{{ title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.js"></script>
+    <style>
+      .map-popup {
+        max-width: 280px;
+        font-family: Inter, system-ui, sans-serif;
+      }
+      .map-popup h3 {
+        margin: 0 0 0.5rem;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #0f172a;
+      }
+      .map-popup p {
+        margin: 0;
+        font-size: 0.875rem;
+        line-height: 1.45;
+        color: #475569;
+      }
+      .map-popup .map-popup__photos {
+        margin-top: 0.75rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .map-popup .map-popup__photos img {
+        max-width: 200px;
+        width: 100%;
+        height: auto;
+        border-radius: 0.5rem;
+        display: block;
+        object-fit: cover;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen bg-slate-50 font-sans text-slate-800 antialiased">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-3 focus:py-2 focus:shadow-lg"
+      >Skip to content</a
+    >
+
+    <header class="border-b border-slate-200/80 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+      <div class="mx-auto max-w-6xl px-4 py-4 sm:py-5">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div class="text-center lg:text-left">
+            <p class="text-xs font-semibold uppercase tracking-widest text-amber-700">Food security · Two communities</p>
+            <h1 class="mt-1 text-xl font-bold tracking-tight text-slate-900 sm:text-2xl md:text-3xl">
+              {{ title }}
+            </h1>
+          </div>
+          <nav
+            class="flex flex-wrap items-center justify-center gap-2 sm:justify-end"
+            aria-label="Primary"
+          >
+            <a
+              href="/leaderboards"
+              class="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-amber-200 hover:bg-amber-50 hover:text-amber-900 sm:text-sm"
+              >Leaderboards</a
+            >
+            <a
+              href="/donate"
+              class="inline-flex items-center justify-center rounded-full bg-amber-600 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-amber-600/25 transition hover:bg-amber-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 sm:text-sm"
+              >Donate</a
+            >
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- Hero -->
+      <section
+        class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-amber-950 to-slate-900 text-white"
+        aria-labelledby="hero-heading"
+      >
+        <div
+          class="pointer-events-none absolute inset-0 opacity-45"
+          style="background-image: radial-gradient(circle at 15% 25%, rgba(251, 191, 36, 0.35), transparent 42%), radial-gradient(circle at 85% 10%, rgba(56, 189, 248, 0.22), transparent 38%)"
+        ></div>
+        <div class="relative mx-auto max-w-6xl px-4 py-14 sm:py-16 lg:py-20">
+          <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-12">
+            <div>
+              <p class="text-sm font-medium uppercase tracking-wider text-amber-200/90">
+                Pittsburgh → Washington, D.C. ~350 miles
+              </p>
+              <h2
+                id="hero-heading"
+                class="mt-3 text-3xl font-extrabold leading-tight sm:text-4xl lg:text-[2.5rem] lg:leading-tight"
+              >
+                Maryland to Pittsburgh
+              </h2>
+              <p class="mt-5 max-w-xl text-base leading-relaxed text-slate-200 sm:text-lg">
+                After my last finals this semester I will be biking home the morning of May 29th 2026 rather than driving or flying. Following the Greater
+                Allegheny Passage and the C&amp;O Towpath I will end at the Lincoln Memorial after approximately 350 miles
+                and (hopefully) 36 hours, 24 of those biking. Scroll below to see my progress in real time and the photos I was able to take along the way.
+              </p>
+              <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <a
+                  href="/donate"
+                  class="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-amber-950 shadow-lg transition hover:bg-amber-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-amber-950"
+                >
+                  Donate to the Cause
+                </a>
+                <a
+                  href="#mission"
+                  class="inline-flex items-center justify-center text-sm font-medium text-amber-100 underline-offset-4 transition hover:text-white hover:underline"
+                >
+                  About this ride
+                </a>
+              </div>
+            </div>
+            <figure class="mx-auto w-full max-w-xl lg:max-w-none">
+              <div class="overflow-hidden rounded-2xl border border-white/10 bg-slate-900/40 shadow-2xl shadow-black/40 ring-1 ring-white/10">
+                <img
+                  src="/static/GAPCO-Static-Map.png" 
+                  alt="Static map of the Greater Allegheny Passage and C&amp;O Towpath route toward Washington, D.C."
+                  class="h-auto w-full object-cover object-center"
+                  width="1200"
+                  height="800"
+                  loading="eager"
+                  decoding="async"
+                />
+              </div>
+              <figcaption class="mt-3 text-center text-xs text-slate-300 sm:text-sm">
+                GAP + C&amp;O
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mission -->
+      <section id="mission" class="mx-auto max-w-3xl px-4 py-14 sm:py-16" aria-labelledby="mission-heading">
+        <h2 id="mission-heading" class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          About the ride
+        </h2>
+        <div class="prose prose-slate mt-6 max-w-none text-base leading-relaxed text-slate-600 sm:text-lg">
+          <p>
+            I have always wanted to bike the GAP and C&amp;O Towpath routes since I have been going to school in Pittsburgh. 
+            This ride is mostly functional so I can go home before returning to Pittsburgh to participate in my internship this
+            summer. But I figured I should put some meaning into the ride. I am calling on family, friends, and all others 
+            to donate just a couple cents per mile to make it a worthwhile experience. The goal is to raise $10 per mile, which
+            over approximately 350 miles comes to $3,500.
+          </p>
+          <p class="mt-4 rounded-xl border border-slate-200 bg-white p-5 text-slate-700 shadow-sm">
+            In the past I worked on efforts supporting the Maryland Food Bank, those projects were some of my most rewarding I have participated in.
+            Since I have been living in Pittsburgh I have become invested and wanted to support both my home and home away from home.
+            In Maryland an increased cost of living and food in particular, leaves 40% of food 
+            insecure Marylanders working full time jobs and earning too much to qualify for federal food assistance.
+            Pittsburgh has seen immense revitalization with the growth of its tech hub. But Pittsburgh is a city of neighborhoods, and while some have thrived in the revitalization,
+            other neighborhoods have lagged with the loss of heavy industry.
+          </p>
+          <p class="mt-4">
+            Donating to the <strong class="font-semibold text-slate-900">Maryland Food Bank</strong> or the
+            <strong class="font-semibold text-slate-900">Greater Pittsburgh Community Food Bank</strong> will give you a chance to appear on the leaderboard.
+            Both the Maryland Food Bank and the Greater Pittsburgh Community Food Bank are extremely effective in their causes.
+            The Maryland Food Bank has a 90% resource efficiency rate, meaning that 90% of their funds go directly to food distribution - rather than admin or fundraisingcosts.
+            The Greater Pittsburgh Community Food Bank ensures that for every dollar donated, 3 meals are provided to those in need.
+          </p>
+        </div>
+
+        <div class="mt-10 grid gap-4 sm:grid-cols-2">
+          <a
+            href="/leaderboards#board-maryland"
+            class="group rounded-2xl border border-amber-100 bg-gradient-to-br from-amber-50 to-white p-5 shadow-sm transition hover:border-amber-200 hover:shadow-md"
+          >
+            <p class="text-xs font-bold uppercase tracking-wide text-amber-800">Leaderboard</p>
+            <p class="mt-1 text-lg font-bold text-slate-900">Maryland Food Bank donations</p>
+            <p class="mt-2 text-sm text-slate-600">See top supporters for the Maryland leg of this fundraiser.</p>
+            <p class="mt-3 text-sm font-semibold text-amber-700 group-hover:underline">View leaderboard →</p>
+          </a>
+          <a
+            href="/leaderboards#board-pittsburgh"
+            class="group rounded-2xl border border-sky-100 bg-gradient-to-br from-sky-50 to-white p-5 shadow-sm transition hover:border-sky-200 hover:shadow-md"
+          >
+            <p class="text-xs font-bold uppercase tracking-wide text-sky-800">Leaderboard</p>
+            <p class="mt-1 text-lg font-bold text-slate-900">Pittsburgh Food Bank donations</p>
+            <p class="mt-2 text-sm text-slate-600">See top supporters for the Pittsburgh-area food bank.</p>
+            <p class="mt-3 text-sm font-semibold text-sky-700 group-hover:underline">View leaderboard →</p>
+          </a>
+        </div>
+
+        <div
+          class="mt-10 rounded-2xl border border-amber-100 bg-gradient-to-br from-amber-50 to-white p-6 shadow-sm sm:p-8"
+        >
+          <p class="text-center text-sm font-medium text-slate-700 sm:text-base">
+            More information about donating—and how to be featured on the Maryland or Pittsburgh donor leaderboards—can be
+            found on the
+            <a
+              href="/donate"
+              class="font-semibold text-amber-800 underline decoration-amber-300 underline-offset-2 hover:text-amber-950"
+              >donate page</a
+            >.
+          </p>
+          <div class="mt-6 flex justify-center">
+            <a
+              href="/donate"
+              class="inline-flex w-full max-w-sm items-center justify-center rounded-full bg-amber-600 px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-amber-600/30 transition hover:bg-amber-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 sm:w-auto"
+            >
+              Donate to the Cause
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Route / Map placeholder -->
+      <section class="border-t border-slate-200 bg-white py-14 sm:py-16" aria-labelledby="route-heading">
+        <div class="mx-auto max-w-6xl px-4">
+          <div class="max-w-2xl">
+            <h2 id="route-heading" class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">The Route</h2>
+            <p class="mt-3 text-slate-600">
+              <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">/api/pins</code> Click a
+              marker for details and photos.
+            </p>
+          </div>
+          <div
+            id="map"
+            class="relative mt-8 h-[500px] w-full overflow-hidden rounded-2xl bg-gray-200 shadow-lg ring-1 ring-slate-900/5"
+            role="region"
+            aria-label="Interactive route map"
+          ></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="border-t border-slate-200 bg-slate-50 py-8 text-center text-sm text-slate-500">
+      <p>{{ title }} · Supporting Maryland &amp; Pittsburgh food banks</p>
+    </footer>
+
+    <script>
+      (function () {
+        mapboxgl.accessToken = {{ mapbox_token | tojson }};
+
+        function escapeHtml(s) {
+          return String(s == null ? "" : s)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+        }
+
+        function buildPopupHtml(pin) {
+          var title = escapeHtml(pin.title || "");
+          var desc = escapeHtml(pin.description || "");
+          var urls = Array.isArray(pin.photos) ? pin.photos : [];
+          var imgs = urls
+            .map(function (url) {
+              return (
+                '<img src="' +
+                escapeHtml(url) +
+                '" alt="" loading="lazy" decoding="async" />'
+              );
+            })
+            .join("");
+          var photosBlock =
+            imgs.length > 0
+              ? '<div class="map-popup__photos">' + imgs + "</div>"
+              : "";
+          return (
+            '<div class="map-popup">' +
+            "<h3>" +
+            title +
+            "</h3>" +
+            "<p>" +
+            desc +
+            "</p>" +
+            photosBlock +
+            "</div>"
+          );
+        }
+
+        var map = new mapboxgl.Map({
+          container: "map",
+          style: "mapbox://styles/mapbox/streets-v12",
+          center: [-78.5, 39.5],
+          zoom: 6,
+        });
+
+        map.on("load", function () {
+          fetch("/api/pins")
+            .then(function (res) {
+              if (!res.ok) throw new Error("Pins request failed: " + res.status);
+              return res.json();
+            })
+            .then(function (pins) {
+              (pins || []).forEach(function (pin) {
+                var lng = pin.lng;
+                var lat = pin.lat;
+                if (lng == null || lat == null) return;
+
+                var popup = new mapboxgl.Popup({
+                  offset: 24,
+                  closeButton: true,
+                  maxWidth: "320px",
+                }).setHTML(buildPopupHtml(pin));
+
+                new mapboxgl.Marker().setLngLat([Number(lng), Number(lat)]).setPopup(popup).addTo(map);
+              });
+            })
+            .catch(function (err) {
+              console.error(err);
+            });
+        });
+      })();
+    </script>
+  </body>
+</html>

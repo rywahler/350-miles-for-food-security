@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>{{ title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="min-h-screen bg-slate-900 pb-10 font-sans text-slate-100 antialiased">
+    <header class="sticky top-0 z-10 border-b border-slate-700 bg-slate-900/95 backdrop-blur">
+      <div class="mx-auto flex max-w-lg items-center justify-between gap-3 px-4 py-3">
+        <h1 class="text-lg font-bold tracking-tight">Map pins</h1>
+        <a href="/" class="text-sm font-medium text-amber-400 hover:text-amber-300">Home</a>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-lg px-4 pt-6">
+      <p class="text-sm text-slate-400">
+        Add a pin and photos while you ride. Location uses your phone GPS (HTTPS required).
+      </p>
+
+      <form id="pin-form" class="mt-6 space-y-5 rounded-2xl border border-slate-700 bg-slate-800/50 p-5 shadow-xl">
+        <div>
+          <label for="title" class="block text-sm font-medium text-slate-300">Title</label>
+          <input
+            id="title"
+            name="title"
+            type="text"
+            required
+            autocomplete="off"
+            class="mt-1.5 w-full rounded-xl border border-slate-600 bg-slate-900 px-3 py-3 text-base text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+            placeholder="e.g. Mile 120 — lunch stop"
+          />
+        </div>
+
+        <div>
+          <label for="description" class="block text-sm font-medium text-slate-300">Description</label>
+          <textarea
+            id="description"
+            name="description"
+            rows="3"
+            required
+            class="mt-1.5 w-full resize-y rounded-xl border border-slate-600 bg-slate-900 px-3 py-3 text-base text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+            placeholder="Short note for the popup…"
+          ></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="lat" class="block text-sm font-medium text-slate-300">Latitude</label>
+            <input
+              id="lat"
+              name="lat"
+              type="text"
+              inputmode="decimal"
+              readonly
+              required
+              class="mt-1.5 w-full cursor-not-allowed rounded-xl border border-slate-600 bg-slate-950 px-3 py-3 text-base text-slate-300"
+              placeholder="—"
+            />
+          </div>
+          <div>
+            <label for="lng" class="block text-sm font-medium text-slate-300">Longitude</label>
+            <input
+              id="lng"
+              name="lng"
+              type="text"
+              inputmode="decimal"
+              readonly
+              required
+              class="mt-1.5 w-full cursor-not-allowed rounded-xl border border-slate-600 bg-slate-950 px-3 py-3 text-base text-slate-300"
+              placeholder="—"
+            />
+          </div>
+        </div>
+
+        <button
+          type="button"
+          id="btn-geo"
+          class="w-full rounded-xl bg-amber-500 py-3.5 text-base font-bold text-slate-900 shadow-lg shadow-amber-500/20 transition hover:bg-amber-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 active:scale-[0.99]"
+        >
+          Get current location
+        </button>
+        <p id="geo-status" class="hidden text-center text-xs text-slate-400" aria-live="polite"></p>
+
+        <div>
+          <label for="photos" class="block text-sm font-medium text-slate-300">Photos</label>
+          <input
+            id="photos"
+            name="photos"
+            type="file"
+            accept="image/*"
+            multiple
+            class="mt-1.5 block w-full text-sm text-slate-300 file:mr-3 file:rounded-lg file:border-0 file:bg-amber-500 file:px-4 file:py-2 file:font-semibold file:text-slate-900 hover:file:bg-amber-400"
+          />
+        </div>
+
+        <button
+          type="submit"
+          id="btn-submit"
+          class="relative w-full overflow-hidden rounded-xl bg-emerald-600 py-3.5 text-base font-bold text-white shadow-lg transition hover:bg-emerald-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <span id="submit-label">Save pin &amp; upload photos</span>
+          <span
+            id="submit-spinner"
+            class="pointer-events-none absolute inset-0 hidden flex items-center justify-center bg-emerald-600"
+            aria-hidden="true"
+          >
+            <svg class="h-8 w-8 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+          </span>
+        </button>
+      </form>
+
+      <div
+        id="success-banner"
+        class="mt-5 hidden rounded-xl border border-emerald-600/50 bg-emerald-950/80 px-4 py-3 text-sm text-emerald-100"
+        role="status"
+      >
+        <p class="font-semibold text-emerald-300">Saved</p>
+        <p id="success-detail" class="mt-1 text-emerald-100/90"></p>
+      </div>
+
+      <p id="form-error" class="mt-4 hidden rounded-xl border border-red-800/60 bg-red-950/50 px-4 py-3 text-sm text-red-200" role="alert"></p>
+    </main>
+
+    <script>
+      (function () {
+        var latEl = document.getElementById("lat");
+        var lngEl = document.getElementById("lng");
+        var geoBtn = document.getElementById("btn-geo");
+        var geoStatus = document.getElementById("geo-status");
+        var form = document.getElementById("pin-form");
+        var submitBtn = document.getElementById("btn-submit");
+        var submitLabel = document.getElementById("submit-label");
+        var submitSpinner = document.getElementById("submit-spinner");
+        var errEl = document.getElementById("form-error");
+        var okBanner = document.getElementById("success-banner");
+        var okDetail = document.getElementById("success-detail");
+
+        function showGeo(msg, isErr) {
+          geoStatus.textContent = msg || "";
+          geoStatus.classList.remove("hidden");
+          geoStatus.classList.toggle("text-red-400", !!isErr);
+          geoStatus.classList.toggle("text-slate-400", !isErr);
+        }
+
+        geoBtn.addEventListener("click", function () {
+          geoStatus.classList.add("hidden");
+          if (!navigator.geolocation) {
+            showGeo("Geolocation is not supported in this browser.", true);
+            return;
+          }
+          showGeo("Getting location…", false);
+          navigator.geolocation.getCurrentPosition(
+            function (pos) {
+              latEl.value = String(pos.coords.latitude);
+              lngEl.value = String(pos.coords.longitude);
+              showGeo("Location captured.", false);
+            },
+            function (e) {
+              showGeo((e && e.message) || "Could not read GPS. Allow location for this site (HTTPS).", true);
+            },
+            { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
+          );
+        });
+
+        function setLoading(on) {
+          submitBtn.disabled = on;
+          submitSpinner.classList.toggle("hidden", !on);
+          submitLabel.classList.toggle("opacity-0", on);
+        }
+
+        function showError(msg) {
+          errEl.textContent = msg || "Request failed.";
+          errEl.classList.remove("hidden");
+        }
+
+        function hideError() {
+          errEl.classList.add("hidden");
+        }
+
+        function hideSuccess() {
+          okBanner.classList.add("hidden");
+        }
+
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          hideError();
+          hideSuccess();
+
+          var title = document.getElementById("title").value.trim();
+          var description = document.getElementById("description").value.trim();
+          var lat = latEl.value.trim();
+          var lng = lngEl.value.trim();
+
+          if (!lat || !lng) {
+            showError("Tap “Get current location” first (or enter coordinates manually is disabled — use GPS).");
+            return;
+          }
+
+          var fd = new FormData();
+          fd.append("title", title);
+          fd.append("description", description);
+          fd.append("lat", lat);
+          fd.append("lng", lng);
+
+          var filesInput = document.getElementById("photos");
+          if (filesInput.files && filesInput.files.length) {
+            for (var i = 0; i < filesInput.files.length; i++) {
+              fd.append("photos", filesInput.files[i]);
+            }
+          }
+
+          setLoading(true);
+
+          fetch("/api/admin/add-pin", {
+            method: "POST",
+            body: fd,
+            credentials: "include",
+          })
+            .then(function (res) {
+              return res.text().then(function (text) {
+                var body = {};
+                try {
+                  body = text ? JSON.parse(text) : {};
+                } catch (ignore) {
+                  body = { detail: text ? text.slice(0, 240) : "Bad response" };
+                }
+                return { ok: res.ok, status: res.status, body: body };
+              });
+            })
+            .then(function (r) {
+              if (r.ok && r.body && r.body.success) {
+                okDetail.textContent =
+                  "Pin #" +
+                  (r.body.pin_id != null ? r.body.pin_id : "?") +
+                  " · " +
+                  (r.body.photos_count || 0) +
+                  " photo(s) uploaded.";
+                okBanner.classList.remove("hidden");
+                form.reset();
+                latEl.value = "";
+                lngEl.value = "";
+                return;
+              }
+              var d = r.body && r.body.detail;
+              if (typeof d === "string") showError(d);
+              else if (Array.isArray(d)) showError(d.map(function (x) { return x.msg || JSON.stringify(x); }).join(" "));
+              else showError("Upload failed (" + r.status + ").");
+            })
+            .catch(function () {
+              showError("Network error. Are you online?");
+            })
+            .finally(function () {
+              setLoading(false);
+            });
+        });
+      })();
+    </script>
+  </body>
+</html>
