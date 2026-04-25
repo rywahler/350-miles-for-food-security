@@ -52,14 +52,8 @@ async def donate_page(request: Request):
     )
 
 @pages.get("/leaderboards")
-async def leaderboards_page(request: Request):
-    return templates.TemplateResponse(
-        request=request,
-        name="leaderboard.html",
-        context={
-            "title": "Leaderboards — 350 Miles for Food Security"
-        }
-    )
+async def leaderboards_page():
+    return RedirectResponse(url="/donate", status_code=307)
 
 app.include_router(pages)
 
@@ -218,12 +212,12 @@ async def read_root(request: Request):
 
 @app.get("/leaderboard/maryland-food-bank")
 async def legacy_leaderboard_maryland():
-    return RedirectResponse(url="/leaderboards", status_code=307)
+    return RedirectResponse(url="/donate", status_code=307)
 
 
 @app.get("/leaderboard/pittsburgh-food-bank")
 async def legacy_leaderboard_pittsburgh():
-    return RedirectResponse(url="/leaderboards", status_code=307)
+    return RedirectResponse(url="/donate", status_code=307)
 
 
 @app.get("/api/pins")
