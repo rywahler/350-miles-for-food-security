@@ -228,7 +228,7 @@ async def api_pins():
             detail="Supabase is not configured. Set SUPABASE_URL and SUPABASE_KEY in .env.",
         )
 
-    pins_res = supabase.table("map_pins").select("*").execute()
+    pins_res = supabase.table("map_pins").select("*").order("id", desc=False).execute()
     pins = pins_res.data or []
 
     if not pins:
@@ -236,7 +236,11 @@ async def api_pins():
 
     pin_ids = [p["id"] for p in pins]
     photos_res = (
-        supabase.table("pin_photos").select("pin_id, image_url").in_("pin_id", pin_ids).execute()
+        supabase.table("pin_photos")
+        .select("pin_id, image_url")
+        .in_("pin_id", pin_ids)
+        .order("id", desc=False)
+        .execute()
     )
     rows = photos_res.data or []
 
@@ -252,6 +256,57 @@ async def api_pins():
         pin["photos"] = by_pin.get(pin["id"], [])
 
     return pins
+
+
+@app.get("/api/gallery-photos")
+async def api_gallery_photos():
+    if supabase is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Supabase is not configured. Set SUPABASE_URL and SUPABASE_KEY in .env.",
+        )
+
+    photos_res = (
+        supabase.table("pin_photos")
+        .select("id, pin_id, image_url")
+        .order("id", desc=False)
+        .execute()
+    )
+    photo_rows = photos_res.data or []
+    if not photo_rows:
+        return []
+
+    pin_ids = sorted({row.get("pin_id") for row in photo_rows if row.get("pin_id") is not None})
+    pin_titles_by_id: dict[int, str] = {}
+    if pin_ids:
+        pins_res = (
+            supabase.table("map_pins")
+            .select("id, title")
+            .in_("id", pin_ids)
+            .execute()
+        )
+        for row in pins_res.data or []:
+            pid = row.get("id")
+            if pid is None:
+                continue
+            pin_titles_by_id[pid] = (row.get("title") or "").strip()
+
+    gallery = []
+    for row in photo_rows:
+        pin_id = row.get("pin_id")
+        image_url = row.get("image_url")
+        if pin_id is None or not image_url:
+            continue
+        gallery.append(
+            {
+                "id": row.get("id"),
+                "pin_id": pin_id,
+                "image_url": image_url,
+                "pin_title": pin_titles_by_id.get(pin_id, ""),
+            }
+        )
+
+    return gallery
 
 
 CLAUDE_RECEIPT_MODEL = "claude-sonnet-4-6"
